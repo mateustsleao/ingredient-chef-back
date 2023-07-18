@@ -1,0 +1,14 @@
+{
+  "name": "ingredient-chef-back",
+  "version": "1.0.0",
+  "description": "ingredient chef backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Mateus Toledo",
+  "license": "ISC",
+  "devDependencies": {
+    "git-commit-msg-linter": "^5.0.4"
+  }
+}
