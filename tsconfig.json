@@ -1,10 +1,20 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
+    "outDir": "dist",
     "module": "commonjs",
     "target": "ES2022",
     "esModuleInterop": true,
-    "allowJs": true
-
+    "allowJs": true,
+    "strictNullChecks": true
   }
+    // "skipLibCheck": true,
+    // "forceConsistentCasingInFileNames": true,
+  //   "baseUrl": "src",
+  //   "paths": {
+  //     "@/*": ["*"],
+  //     "@/tests/*": ["../tests/*"],
+  //   },
+  //   "rootDirs": ["src", "tests"]
+  // },
+  // "include": ["src", "tests"]
 }
