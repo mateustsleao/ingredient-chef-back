@@ -61,4 +61,28 @@ describe('Build Recipe Controller', () => {
     sut.handle(httpRequest)
     expect(buildRecipeSpy).toHaveBeenCalledWith(httpRequest.body)
   })
+  test('Should return 200 if valid data is provided', () => {
+    const { sut } = makeSut()
+    const httpRequest = makeFakeRequest()
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body).toEqual({
+      id: 'valid_id',
+      name: 'valid_name',
+      ingredients: [{
+        description: 'valid_description'
+      }],
+      steps: [{
+        step: 'valid_step'
+      }],
+      nutrition: {
+        values: [{
+          nutriente: 'valid_nutriente'
+        }],
+        fact: 'valid_nutritionFact'
+      },
+      portions: 1,
+      time: 1
+    })
+  })
 })
