@@ -5,16 +5,13 @@
     "target": "ES2022",
     "esModuleInterop": true,
     "allowJs": true,
-    "strictNullChecks": true
-  }
-    // "skipLibCheck": true,
-    // "forceConsistentCasingInFileNames": true,
-  //   "baseUrl": "src",
-  //   "paths": {
-  //     "@/*": ["*"],
-  //     "@/tests/*": ["../tests/*"],
-  //   },
-  //   "rootDirs": ["src", "tests"]
-  // },
-  // "include": ["src", "tests"]
+    "strictNullChecks": true,
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"],
+      "@/tests/*": ["../tests/*"],
+    },
+    "rootDirs": ["src", "tests"]
+  },
+  "include": ["src", "tests"]
 }
