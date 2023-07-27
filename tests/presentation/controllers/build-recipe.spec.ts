@@ -1,88 +1,51 @@
-import { BuildRecipeController } from '../../../src/controller/build-recipe-controller'
-import { type RecipeModel } from '../../../src/domain/models/recipe'
-import { type BuildRecipe, type BuildRecipeModel } from '../../../src/domain/use-cases/build-recipe'
-import { type HttpRequest } from '../protocols/http'
-
-const makeFakeRequest = (): HttpRequest => ({
-  body: {
-    name: 'valid_name',
-    ingredients: [{
-      description: 'valid_description'
-    }],
-    meal: 'valid_meal',
-    quantity: 1
-  }
-})
-
-const makeBuildRecipe = (): BuildRecipe => {
-  class BuildRecipeStub implements BuildRecipe {
-    build (recipe: BuildRecipeModel): RecipeModel {
-      return {
-        id: 'valid_id',
-        name: 'valid_name',
-        ingredients: [{
-          description: 'valid_description'
-        }],
-        steps: [{
-          step: 'valid_step'
-        }],
-        nutrition: {
-          values: [{
-            nutriente: 'valid_nutriente'
-          }],
-          fact: 'valid_nutritionFact'
-        },
-        portions: 1,
-        time: 1
-      }
-    }
-  }
-  return new BuildRecipeStub()
-}
+import { BuildRecipeController } from '@/presentation/controller'
+import { ValidationSpy, BuildRecipeSpy, makeFakeRequest, makeFakeResponse } from '@/tests/presentation/mocks'
+import { ok, serverError } from '@/presentation/helpers'
 
 type SutTypes = {
   sut: BuildRecipeController
-  buildRecipeStub: BuildRecipe
+  validationSpy: ValidationSpy
+  buildRecipeSpy: BuildRecipeSpy
 }
 
 const makeSut = (): SutTypes => {
-  const buildRecipeStub = makeBuildRecipe()
-  const sut = new BuildRecipeController(buildRecipeStub)
+  const validationSpy = new ValidationSpy()
+  const buildRecipeSpy = new BuildRecipeSpy()
+
+  const sut = new BuildRecipeController(buildRecipeSpy, validationSpy)
   return {
     sut,
-    buildRecipeStub
+    validationSpy,
+    buildRecipeSpy
   }
 }
+
 describe('Build Recipe Controller', () => {
-  test('Should call BuildRecipe with correct values', () => {
-    const { sut, buildRecipeStub } = makeSut()
-    const buildRecipeSpy = jest.spyOn(buildRecipeStub, 'build')
+  test('Should call BuildRecipe with correct values', async () => {
+    const { sut, validationSpy } = makeSut()
     const httpRequest = makeFakeRequest()
-    sut.handle(httpRequest)
-    expect(buildRecipeSpy).toHaveBeenCalledWith(httpRequest.body)
+    await sut.handle(httpRequest)
+    expect(validationSpy.input).toEqual(httpRequest.body)
   })
-  test('Should return 200 if valid data is provided', () => {
+  test('Should return 200 if valid data is provided', async () => {
     const { sut } = makeSut()
     const httpRequest = makeFakeRequest()
-    const httpResponse = sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(200)
-    expect(httpResponse.body).toEqual({
-      id: 'valid_id',
-      name: 'valid_name',
-      ingredients: [{
-        description: 'valid_description'
-      }],
-      steps: [{
-        step: 'valid_step'
-      }],
-      nutrition: {
-        values: [{
-          nutriente: 'valid_nutriente'
-        }],
-        fact: 'valid_nutritionFact'
-      },
-      portions: 1,
-      time: 1
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse).toEqual(ok(makeFakeResponse()))
+  })
+  test('Should return 500 if BuildRecipe throws', async () => {
+    const { sut, buildRecipeSpy } = makeSut()
+    jest.spyOn(buildRecipeSpy, 'build').mockImplementationOnce(() => { throw new Error() })
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(serverError(new Error()))
+  })
+  test('Should return 400 if Validation returns an error', async () => {
+    const { sut, validationSpy } = makeSut()
+    validationSpy.error = new Error()
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual({
+      statusCode: 400,
+      body: validationSpy.error
     })
   })
 })
