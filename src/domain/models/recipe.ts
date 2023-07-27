@@ -9,7 +9,7 @@ export interface RecipeModel {
   }]
   nutrition: {
     values: [{
-      nutriente: string
+      name: string
     }]
     fact: string
   }
